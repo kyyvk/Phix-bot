@@ -1,6 +1,6 @@
+require('dotenv').config();
 const { REST, Routes } = require('discord.js');
 const fs = require('fs');
-const config = require('./config.json');
 
 const commands = [];
 const commandFiles = fs.readdirSync('./commands');
@@ -10,18 +10,18 @@ for (const file of commandFiles) {
   commands.push(command.data.toJSON());
 }
 
-const rest = new REST({ version: '10' }).setToken(config.token);
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 (async () => {
   try {
     console.log('Registering commands...');
 
     await rest.put(
-      Routes.applicationGuildCommands(config.clientId, config.guildId),
+      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
       { body: commands }
     );
 
-    console.log('Commands registered!');
+    console.log('✅ Commands registered!');
   } catch (error) {
     console.error(error);
   }
