@@ -52,8 +52,8 @@ module.exports = {
     // AUTO PROMOTE NEW
       const config = require('../config.json');
 
-      const memberRole = message.guild.roles.cache.find(r => r.name === "Member");
-      const newRole = message.guild.roles.cache.find(r => r.name === "New");
+      const memberRole = message.guild.roles.cache.find(r => r.name === "member");
+      const newRole = message.guild.roles.cache.find(r => r.name === "new");
 
       if (progress.chat >= 5 && memberRole && newRole) {
         if (message.member.roles.cache.has(newRole.id)) {

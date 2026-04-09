@@ -3,6 +3,17 @@ const config = require('../config.json');
 module.exports = {
   name: 'guildMemberAdd',
   async execute(member) {
+
+    // AUTO ROLE NEW
+    const newRole = member.guild.roles.cache.find(r => r.name === "new");
+
+    if (newRole) {
+      await member.roles.add(newRole);
+    } else {
+      console.log("❌ Role 'New' tidak ditemukan");
+    }
+
+    // WELCOME MESSAGE
     const channel = member.guild.channels.cache.get(config.channels.welcome);
 
     if (channel) {
@@ -16,10 +27,6 @@ module.exports = {
 
 🔥 Jangan cuma jadi penonton ya.`
       );
-    }
-    const role = member.guild.roles.cache.find(r => r.name === "New");
-      if (role) {
-      member.roles.add(role);
     }
   }
 };
