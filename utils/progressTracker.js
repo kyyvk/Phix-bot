@@ -1,72 +1,46 @@
 const fs = require('fs');
-const path = './progress.json';
+const config = require('../config.json');
 
-function load() {
-  if (!fs.existsSync(path)) fs.writeFileSync(path, JSON.stringify({}));
-  return JSON.parse(fs.readFileSync(path));
-}
+function updateProgress(userId, channelId) {
+  let data = {};
 
-function save(data) {
-  fs.writeFileSync(path, JSON.stringify(data, null, 2));
-}
-
-function markActive(userId) {
-  const data = load();
-
-  if (!data[userId]) {
-    data[userId] = {
-      chat: 0,
-      shared: false,
-      nudged: false
-    };
+  if (fs.existsSync('./progress.json')) {
+    data = JSON.parse(fs.readFileSync('./progress.json'));
   }
 
-  data[userId].chat += 1;
-
-  save(data);
-}
-
-function markShared(userId) {
-  const data = load();
-
   if (!data[userId]) {
-    data[userId] = {
-      chat: 0,
-      shared: true,
-      nudged: false
-    };
-  } else {
+    data[userId] = { chat: 0, shared: false, nudged: false };
+  }
+
+  if (channelId === config.channels.general) {
+    data[userId].chat++;
+  }
+
+  if (channelId === config.channels.share) {
     data[userId].shared = true;
   }
 
-  save(data);
+  fs.writeFileSync('./progress.json', JSON.stringify(data, null, 2));
+
+  return data[userId];
 }
 
 function shouldNudge(userId) {
-  const data = load();
+  let data = {};
+
+  if (!fs.existsSync('./progress.json')) return false;
+
+  data = JSON.parse(fs.readFileSync('./progress.json'));
 
   if (!data[userId]) return false;
 
-  return (
-    data[userId].chat >= 5 &&
-    !data[userId].shared &&
-    !data[userId].nudged
-  );
-}
-
-function markNudged(userId) {
-  const data = load();
-
-  if (data[userId]) {
+  if (data[userId].chat >= 5 && !data[userId].shared && !data[userId].nudged) {
     data[userId].nudged = true;
+    fs.writeFileSync('./progress.json', JSON.stringify(data, null, 2));
+    return true;
   }
 
-  save(data);
+  return false;
 }
 
-module.exports = {
-  markActive,
-  markShared,
-  shouldNudge,
-  markNudged
-};
+module.exports = { updateProgress, shouldNudge };

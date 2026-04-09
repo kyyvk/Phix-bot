@@ -1,39 +1,29 @@
 const fs = require('fs');
-const path = './database.json';
 
-function loadData() {
-  if (!fs.existsSync(path)) {
-    fs.writeFileSync(path, JSON.stringify({}));
+function addXP(userId, amount) {
+  let data = {};
+
+  if (fs.existsSync('./database.json')) {
+    data = JSON.parse(fs.readFileSync('./database.json'));
   }
-  return JSON.parse(fs.readFileSync(path));
-}
-
-function saveData(data) {
-  fs.writeFileSync(path, JSON.stringify(data, null, 2));
-}
-
-async function addXP(userId) {
-  const data = loadData();
 
   if (!data[userId]) {
     data[userId] = { xp: 0, level: 0 };
   }
 
-  const gain = Math.floor(Math.random() * 10) + 5;
-  data[userId].xp += gain;
+  data[userId].xp += amount;
 
   const newLevel = Math.floor(0.1 * Math.sqrt(data[userId].xp));
+  let leveledUp = false;
 
-  const leveledUp = newLevel > data[userId].level;
-  data[userId].level = newLevel;
+  if (newLevel > data[userId].level) {
+    data[userId].level = newLevel;
+    leveledUp = true;
+  }
 
-  saveData(data);
+  fs.writeFileSync('./database.json', JSON.stringify(data, null, 2));
 
-  return {
-    xp: data[userId].xp,
-    level: data[userId].level,
-    leveledUp
-  };
+  return { ...data[userId], leveledUp };
 }
 
 module.exports = { addXP };

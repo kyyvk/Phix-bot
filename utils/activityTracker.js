@@ -1,10 +1,7 @@
 let activity = {};
 
 function markActive(userId) {
-  if (!activity[userId]) {
-    activity[userId] = 0;
-  }
-
+  if (!activity[userId]) activity[userId] = 0;
   activity[userId]++;
 }
 
@@ -26,8 +23,4 @@ function reset() {
   activity = {};
 }
 
-module.exports = {
-  markActive,
-  getTopUser,
-  reset
-};
+module.exports = { markActive, getTopUser, reset };
