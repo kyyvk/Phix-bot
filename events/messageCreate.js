@@ -19,11 +19,28 @@ module.exports = {
     // XP
     const data = await addXP(userId);
 
+    // Level UP
     if (data.leveledUp) {
+  message.channel.send(
+    `🔥 ${message.author} naik ke level ${data.level}!`
+  );
+
+  const config = require('../config.json');
+  const levelRoles = config.levelRoles || {};
+
+  const roleId = levelRoles[data.level];
+
+  if (roleId) {
+    const role = message.guild.roles.cache.get(roleId);
+    if (role) {
+      await message.member.roles.add(role);
+
       message.channel.send(
-        `🔥 ${message.author} naik ke level ${data.level}!`
+        `🎉 ${message.author} mendapatkan role baru: **${role.name}**!`
       );
     }
+  }
+}
 
     // ACTIVITY TRACK
     track(userId);
