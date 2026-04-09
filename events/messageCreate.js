@@ -1,13 +1,9 @@
 const { addXP } = require('../utils/xp');
-const { track } = require('../utils/activityTracker');
-const {
-  markActive,
-  markShared,
-  shouldNudge,
-  markNudged
-} = require('../utils/progressTracker');
-
+const { markActive } = require('../utils/activityTracker');
+const { updateProgress, shouldNudge } = require('../utils/progressTracker');
 const config = require('../config.json');
+
+const cooldown = new Map();
 
 module.exports = {
   name: 'messageCreate',
@@ -16,75 +12,85 @@ module.exports = {
 
     const userId = message.author.id;
 
-    // XP
-    const data = await addXP(userId);
+    // =====================
+    // ANTI SPAM COOLDOWN
+    // =====================
+    const now = Date.now();
+    const cooldownTime = 5000;
 
-    // Level UP
-    if (data.leveledUp) {
-  message.channel.send(
-    `🔥 ${message.author} naik ke level ${data.level}!`
-  );
-
-  const config = require('../config.json');
-  const levelRoles = config.levelRoles || {};
-
-  const roleId = levelRoles[data.level];
-
-  if (roleId) {
-    const role = message.guild.roles.cache.get(roleId);
-    if (role) {
-      await message.member.roles.add(role);
-
-      message.channel.send(
-        `🎉 ${message.author} mendapatkan role baru: **${role.name}**!`
-      );
+    if (cooldown.has(userId)) {
+      const expiration = cooldown.get(userId) + cooldownTime;
+      if (now < expiration) return;
     }
-  }
-}
 
-    // ACTIVITY TRACK
-    track(userId);
+    cooldown.set(userId, now);
 
-    // MARK ACTIVE (GENERAL)
-    if (message.channel.id === config.channels.general) {
-      markActive(userId);
+    // =====================
+    // XP SYSTEM
+    // =====================
+    const data = addXP(userId, 10);
 
-    // AUTO PROMOTE NEW
-      const config = require('../config.json');
-
-      const memberRole = message.guild.roles.cache.find(r => r.name === "member");
-      const newRole = message.guild.roles.cache.find(r => r.name === "new");
-
-      if (progress.chat >= 5 && memberRole && newRole) {
-        if (message.member.roles.cache.has(newRole.id)) {
-        await message.member.roles.remove(newRole.id);
-        await message.member.roles.add(memberRole.id);
-
+    if (data.leveledUp) {
       message.channel.send(
-      `🎉 ${message.author} sekarang jadi **Member**!`
-    );
-  }
-}
+        `🔥 ${message.author} naik ke level ${data.level}!`
+      );
 
-      // CHECK NUDGE
-      if (shouldNudge(userId)) {
-        message.reply(
-          `👀 Kamu cukup aktif ngobrol, tapi belum share progress.\n\nCoba mulai di channel yang sesuai ya — Phix bukan cuma ngobrol 👇`
-        );
+      const levelRoles = config.levelRoles || {};
+      const roleId = levelRoles[data.level];
 
-        markNudged(userId);
+      if (roleId) {
+        const role = message.guild.roles.cache.get(roleId);
+        if (role) {
+          await message.member.roles.add(role);
+
+          message.channel.send(
+            `🎉 ${message.author} mendapatkan role baru: **${role.name}**!`
+          );
+        }
       }
     }
 
-    // MARK SHARED
-    if (
-      message.channel.id === config.channels.share ||
-      message.channel.id === config.channels.work
-    ) {
-      markShared(userId);
+    // =====================
+    // ACTIVITY TRACKING
+    // =====================
+    markActive(userId);
+
+    // =====================
+    // PROGRESS TRACKING
+    // =====================
+    const progress = updateProgress(userId, message.channel.id);
+
+    // =====================
+    // AUTO PROMOTE NEW → MEMBER
+    // =====================
+    const memberRole = message.guild.roles.cache.find(r => r.name === "Member");
+    const newRole = message.guild.roles.cache.find(r => r.name === "New");
+
+    if (progress.chat >= 5 && memberRole && newRole) {
+      if (message.member.roles.cache.has(newRole.id)) {
+        await message.member.roles.remove(newRole.id);
+        await message.member.roles.add(memberRole.id);
+
+        message.channel.send(
+          `🎉 ${message.author} sekarang jadi **Member**!`
+        );
+      }
     }
 
-    // SMART REACTION
+    // =====================
+    // NUDGE SYSTEM
+    // =====================
+    if (message.channel.id === config.channels.general) {
+      if (shouldNudge(userId)) {
+        message.reply(
+          '👀 Kamu cukup aktif ngobrol, tapi belum share progress. Coba kirim sesuatu di #share-your-work!'
+        );
+      }
+    }
+
+    // =====================
+    // AUTO REACTION
+    // =====================
     if (message.channel.id === config.channels.share) {
       await message.react('🔥');
       await message.react('👏');
@@ -94,7 +100,9 @@ module.exports = {
       await message.react('💡');
     }
 
-    // MODERATION
+    // =====================
+    // SIMPLE MODERATION
+    // =====================
     const badWords = ['tolol', 'anjing', 'goblok'];
 
     if (badWords.some(word => message.content.toLowerCase().includes(word))) {
