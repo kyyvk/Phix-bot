@@ -1,3 +1,4 @@
+console.log("✅ READY TRIGGERED");
 const { startScheduler } = require('../utils/scheduler');
 
 module.exports = {

@@ -1,3 +1,4 @@
+console.log("🚀 BOT STARTING...");
 require('dotenv').config();
 
 const fs = require('fs');
