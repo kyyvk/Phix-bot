@@ -17,5 +17,9 @@ module.exports = {
 🔥 Jangan cuma jadi penonton ya.`
       );
     }
+    const role = member.guild.roles.cache.find(r => r.name === "New");
+      if (role) {
+      member.roles.add(role);
+    }
   }
 };

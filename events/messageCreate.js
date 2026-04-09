@@ -49,6 +49,23 @@ module.exports = {
     if (message.channel.id === config.channels.general) {
       markActive(userId);
 
+    // AUTO PROMOTE NEW
+      const config = require('../config.json');
+
+      const memberRole = message.guild.roles.cache.find(r => r.name === "Member");
+      const newRole = message.guild.roles.cache.find(r => r.name === "New");
+
+      if (progress.chat >= 5 && memberRole && newRole) {
+        if (message.member.roles.cache.has(newRole.id)) {
+        await message.member.roles.remove(newRole.id);
+        await message.member.roles.add(memberRole.id);
+
+      message.channel.send(
+      `🎉 ${message.author} sekarang jadi **Member**!`
+    );
+  }
+}
+
       // CHECK NUDGE
       if (shouldNudge(userId)) {
         message.reply(
