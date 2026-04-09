@@ -1,3 +1,5 @@
+const config = require('../config.json');
+
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction, client) {
@@ -18,16 +20,12 @@ module.exports = {
       }
     }
 
-    // BUTTON
+    // BUTTON ROLE
     if (interaction.isButton()) {
       try {
-        const roleMap = {
-          gamer: '1491527324632350760',
-          creative: '1491527396875046952',
-          learner: '1491527464093220955'
-        };
-
+        const roleMap = config.roles;
         const roleId = roleMap[interaction.customId];
+
         if (!roleId) return;
 
         const member = interaction.member;
@@ -35,7 +33,7 @@ module.exports = {
         if (member.roles.cache.has(roleId)) {
           await member.roles.remove(roleId);
           return interaction.reply({
-            content: `❌ Role dilepas`,
+            content: '❌ Role dilepas',
             ephemeral: true
           });
         }
@@ -43,7 +41,7 @@ module.exports = {
         await member.roles.add(roleId);
 
         await interaction.reply({
-          content: `✅ Role berhasil ditambahkan`,
+          content: '✅ Role berhasil ditambahkan',
           ephemeral: true
         });
 

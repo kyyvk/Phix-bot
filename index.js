@@ -1,13 +1,16 @@
 require('dotenv').config();
 
-console.log("TOKEN TYPE:", typeof process.env.TOKEN);
-console.log("TOKEN VALUE:", process.env.TOKEN);
 const fs = require('fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers
+  ]
 });
 
 client.commands = new Collection();
