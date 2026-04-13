@@ -10,6 +10,7 @@
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
     "mongodb": "^7.1.1",
+    "mongoose": "^9.4.1",
     "node-cron": "^4.2.1"
   }
 }
