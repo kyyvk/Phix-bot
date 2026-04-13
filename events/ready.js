@@ -1,4 +1,4 @@
-const { startScheduler } = require('../utils/scheduler');
+const { startScheduler } = require('../core/services/scheduler')
 
 module.exports = {
   name: 'clientReady',

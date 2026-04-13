@@ -1,6 +1,6 @@
-const { addXP } = require('../utils/xp');
-const { markActive } = require('../utils/activityTracker');
-const { updateProgress, shouldNudge } = require('../utils/progressTracker');
+const { addXP } = require('../core/services/xp');
+const { markActive } = require('../core/services/activityTracker');
+const { updateProgress, shouldNudge } = require('../core/services/progressTracker');
 const config = require('../config.json');
 
 const cooldown = new Map();

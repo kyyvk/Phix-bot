@@ -1,10 +1,13 @@
 const fs = require('fs');
+const path = require('path');
+
+const DB_PATH = path.join(__dirname, '../../data/database.json');
 
 function addXP(userId, amount) {
   let data = {};
 
-  if (fs.existsSync('./database.json')) {
-    data = JSON.parse(fs.readFileSync('./database.json'));
+  if (fs.existsSync(DB_PATH)) {
+    data = JSON.parse(fs.readFileSync(DB_PATH));
   }
 
   if (!data[userId]) {
@@ -21,7 +24,7 @@ function addXP(userId, amount) {
     leveledUp = true;
   }
 
-  fs.writeFileSync('./database.json', JSON.stringify(data, null, 2));
+  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 
   return { ...data[userId], leveledUp };
 }

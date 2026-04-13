@@ -1,11 +1,14 @@
 const fs = require('fs');
-const config = require('../config.json');
+const path = require('path');
+const config = require('../../config.json');
+
+const PROGRESS_PATH = path.join(__dirname, '../../data/progress.json');
 
 function updateProgress(userId, channelId) {
   let data = {};
 
-  if (fs.existsSync('./progress.json')) {
-    data = JSON.parse(fs.readFileSync('./progress.json'));
+  if (fs.existsSync(PROGRESS_PATH)) {
+    data = JSON.parse(fs.readFileSync(PROGRESS_PATH));
   }
 
   if (!data[userId]) {
@@ -20,7 +23,7 @@ function updateProgress(userId, channelId) {
     data[userId].shared = true;
   }
 
-  fs.writeFileSync('./progress.json', JSON.stringify(data, null, 2));
+  fs.writeFileSync(PROGRESS_PATH, JSON.stringify(data, null, 2));
 
   return data[userId];
 }
@@ -28,15 +31,15 @@ function updateProgress(userId, channelId) {
 function shouldNudge(userId) {
   let data = {};
 
-  if (!fs.existsSync('./progress.json')) return false;
+  if (!fs.existsSync(PROGRESS_PATH)) return false;
 
-  data = JSON.parse(fs.readFileSync('./progress.json'));
+  data = JSON.parse(fs.readFileSync(PROGRESS_PATH));
 
   if (!data[userId]) return false;
 
   if (data[userId].chat >= 5 && !data[userId].shared && !data[userId].nudged) {
     data[userId].nudged = true;
-    fs.writeFileSync('./progress.json', JSON.stringify(data, null, 2));
+    fs.writeFileSync(PROGRESS_PATH, JSON.stringify(data, null, 2));
     return true;
   }
 
