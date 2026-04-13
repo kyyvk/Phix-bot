@@ -5,22 +5,4 @@ function markActive(userId) {
   activity[userId]++;
 }
 
-function getTopUser() {
-  let topUser = null;
-  let max = 0;
-
-  for (const userId in activity) {
-    if (activity[userId] > max) {
-      max = activity[userId];
-      topUser = userId;
-    }
-  }
-
-  return topUser;
-}
-
-function reset() {
-  activity = {};
-}
-
-module.exports = { markActive, getTopUser, reset };
+module.exports = { markActive };

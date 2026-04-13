@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const { connectDB } = require('../core/database/db');
 const scheduler = require('../core/services/scheduler');
 
@@ -8,21 +6,14 @@ module.exports = {
   once: true,
 
   async execute(client) {
-    try {
-      console.log('🚀 BOT STARTING...');
+    console.log('🚀 BOT STARTING...');
 
-      // 🔌 Connect ke MongoDB
-      await connectDB();
+    await connectDB();
 
-      console.log(`✅ Bot online sebagai ${client.user.tag}`);
+    console.log(`✅ Bot online sebagai ${client.user.tag}`);
 
-      // 🔁 Jalankan scheduler
-      scheduler(client);
+    scheduler(client);
 
-      console.log('🗓️ Scheduler aktif');
-
-    } catch (error) {
-      console.error('❌ Error di ready event:', error);
-    }
+    console.log('🗓️ Scheduler aktif');
   },
 };

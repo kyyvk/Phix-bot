@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const User = require('../database/userModel');
 
 const DB_PATH = path.join(__dirname, '../../data/database.json');
 
-function addXP(userId, amount) {
+async function addXP(userId, amount) {
   let data = {};
 
   if (fs.existsSync(DB_PATH)) {
@@ -25,6 +26,17 @@ function addXP(userId, amount) {
   }
 
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+
+  // MongoDB sync
+  await User.findOneAndUpdate(
+    { userId },
+    {
+      xp: data[userId].xp,
+      level: data[userId].level,
+      lastActive: new Date(),
+    },
+    { upsert: true }
+  );
 
   return { ...data[userId], leveledUp };
 }
