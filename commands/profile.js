@@ -1,5 +1,21 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
+const path = require('path');
+
+const dbPath = path.join(__dirname, '../data/database.json');
+const progressPath = path.join(__dirname, '../data/progress.json');
+
+function readJSON(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return {};
+    const data = fs.readFileSync(filePath, 'utf-8');
+    if (!data) return {};
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('JSON ERROR:', err);
+    return {};
+  }
+}
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -7,35 +23,17 @@ module.exports = {
     .setDescription('Lihat progress kamu di Phix'),
 
   async execute(interaction) {
-
     const userId = interaction.user.id;
 
-    // =======================
-    // XP DATA
-    // =======================
-    let xpData = {};
-    if (fs.existsSync('./data/database.json')) {
-      xpData = JSON.parse(fs.readFileSync('./data/database.json'));
-    }
+    const xpData = readJSON(dbPath);
+    const progressData = readJSON(progressPath);
 
     const userXP = xpData[userId] || { xp: 0, level: 0 };
-
-    // =======================
-    // PROGRESS DATA
-    // =======================
-    let progressData = {};
-    if (fs.existsSync('./data/progress.json')) {
-      progressData = JSON.parse(fs.readFileSync('./data/progress.json'));
-    }
-
     const progress = progressData[userId] || {
       chat: 0,
       shared: false
     };
 
-    // =======================
-    // EMBED
-    // =======================
     const embed = new EmbedBuilder()
       .setColor('#5865F2')
       .setTitle(`👤 ${interaction.user.username}`)
@@ -47,9 +45,6 @@ module.exports = {
       )
       .setFooter({ text: 'Keep growing di Phix 🚀' });
 
-    await interaction.reply({
-      embeds: [embed],
-      ephemeral: true
-    });
+    await interaction.reply({ embeds: [embed], ephemeral: true });
   }
 };
