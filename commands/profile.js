@@ -7,18 +7,25 @@ module.exports = {
     .setDescription('Lihat progress kamu di Phix'),
 
   async execute(interaction) {
+
     const userId = interaction.user.id;
 
+    // =======================
+    // XP DATA
+    // =======================
     let xpData = {};
-    if (fs.existsSync('./database.json')) {
-      xpData = JSON.parse(fs.readFileSync('./database.json'));
+    if (fs.existsSync('./data/database.json')) {
+      xpData = JSON.parse(fs.readFileSync('./data/database.json'));
     }
 
     const userXP = xpData[userId] || { xp: 0, level: 0 };
 
+    // =======================
+    // PROGRESS DATA
+    // =======================
     let progressData = {};
-    if (fs.existsSync('./progress.json')) {
-      progressData = JSON.parse(fs.readFileSync('./progress.json'));
+    if (fs.existsSync('./data/progress.json')) {
+      progressData = JSON.parse(fs.readFileSync('./data/progress.json'));
     }
 
     const progress = progressData[userId] || {
@@ -26,6 +33,9 @@ module.exports = {
       shared: false
     };
 
+    // =======================
+    // EMBED
+    // =======================
     const embed = new EmbedBuilder()
       .setColor('#5865F2')
       .setTitle(`👤 ${interaction.user.username}`)
@@ -37,6 +47,9 @@ module.exports = {
       )
       .setFooter({ text: 'Keep growing di Phix 🚀' });
 
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.reply({
+      embeds: [embed],
+      ephemeral: true
+    });
   }
 };
